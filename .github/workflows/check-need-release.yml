@@ -1,4 +1,8 @@
 name: Check for new upstream release
+permissions:
+  id-token: write
+  contents: write
+  attestations: write
 
 on:
   workflow_dispatch:
