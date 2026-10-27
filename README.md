@@ -7,7 +7,7 @@ to sign these updates has been generated on GitHub Actions, and I have never see
 not have any access to it. It was successfully generated on 2026-10-28
 [here](https://github.com/jodo248/ublock-origin-crx-auto-builder/actions/runs/40550908737/job/122354077581).
 
-**Extension ID**: `   `
+**Extension ID**: `ljaalbalehicedjcfbbaiemopfcgfehf`
 
 **Update URL**: [`https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/master/update.xml`](https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/master/update.xml)
 
