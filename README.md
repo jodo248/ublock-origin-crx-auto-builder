@@ -9,6 +9,6 @@ not have any access to it. It was successfully generated on 2026-10-28
 
 **Extension ID**: `   `
 
-**Update URL**: [`https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/main/update.xml`](https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/main/update.xml)
+**Update URL**: [`https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/master/update.xml`](https://raw.githubusercontent.com/jodo248/ublock-origin-crx-auto-builder/refs/heads/master/update.xml)
 
 Feel free to mirror these updates off-GitHub.
