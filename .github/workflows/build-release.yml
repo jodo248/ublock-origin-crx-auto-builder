@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ inputs.release-tag }}
-      OUT_FILENAME: "uBlock0_${{ inputs.release-tag }}.crx"
+      OUT_FILENAME: "uBlock_${{ inputs.release-tag }}.crx"
       DIST_DIR: "./uBlock/dist/build/uBlock0.chromium"
     steps:
       - name: Checkout ublock-origin-crx
@@ -71,7 +71,7 @@ jobs:
       - name: Update update.xml
         env:
           APP_ID: ${{ steps.crxid.outputs.crx_id }}
-          DOWNLOAD_URL: ${{ fromJSON(steps.release.outputs.assets)[0].browser_download_url }}
+          DOWNLOAD_URL: "https://github.com/${{ github.repository }}/releases/download/${{ inputs.release-tag }}/${{ env.OUT_FILENAME }}"
           VERSION: ${{ inputs.release-tag }}
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -79,4 +79,4 @@ jobs:
           ./.github/generate-updatexml.sh > update.xml
           git add update.xml
           git commit -m 'update.xml: refresh'
-          git push
+          git push origin HEAD:master
