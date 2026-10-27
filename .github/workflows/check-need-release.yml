@@ -3,7 +3,7 @@ name: Check for new upstream release
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 18 * * *"  # 
+    - cron: "30 18 * * *"  # 
 
 jobs:
   check:
