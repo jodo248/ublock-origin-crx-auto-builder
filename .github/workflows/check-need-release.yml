@@ -3,7 +3,7 @@ name: Check for new upstream release
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 17 * * *"  # midnight GMT+7 (UTC+7 = UTC-7h → 17:00 UTC)
+    - cron: "0 17 * * *"  # 
 
 jobs:
   check:
