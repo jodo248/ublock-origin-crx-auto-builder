@@ -1,4 +1,4 @@
-## ublock-origin-crx
+## ublock-origin-crx-auto-builder
 Unofficial third-party builds of (Manifest V2, not Lite) uBlock Origin
 
 All updates are built exclusively on GitHub Actions. Other than patching in the update URL
