@@ -9,19 +9,19 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GHPAT_TOKEN || github.token }}
     steps:
-      - name: Check out private key generator
-        uses: actions/checkout@v4
-        with:
-          repository: dumbmoron/vanity-crx
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
+      # name: Check out private key generator
+      #  uses: actions/checkout@v4
+      #  with:
+      #    repository: dumbmoron/vanity-crx
+      # uses: denoland/setup-deno@v2
+      #  with:
+      #    deno-version: v2.x
       - name: Generate private key
-        run: 'deno run --frozen=true start --threads 4 --starts-with block | grep PRIVATE -A32 > /dev/shm/key.pem'
+        run: openssl genrsa 2048 > /dev/shm/key.pem
       # thank you: https://stackoverflow.com/questions/72424607/update-a-github-repository-secret-from-a-github-action
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 26
       - run: |
           npm install --global sodium-native@4.3.3
           echo "NODE_PATH=$(npm root -g)" >> $GITHUB_ENV
