@@ -17,9 +17,9 @@ jobs:
     steps:
       - name: Checkout ublock-origin-crx
         uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 26
       - run: ./.github/check-needs-release.js | tee -a "$GITHUB_OUTPUT"
         id: needs-release
   build:
