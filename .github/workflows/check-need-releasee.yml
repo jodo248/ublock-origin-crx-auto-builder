@@ -11,6 +11,8 @@ on:
         required: false
         description: "Upstream release tag (leave empty to auto-detect latest)"
         type: string
+  schedule:
+    - cron: '0 10 * * *'  # 
 
 jobs:
   check:
@@ -21,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 24
       - name: Auto-detect upstream tag
         id: autodetect
         if: ${{ inputs.release-tag == '' }}
