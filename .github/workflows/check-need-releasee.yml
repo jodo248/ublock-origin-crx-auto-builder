@@ -1,0 +1,100 @@
+name: Check and build release
+permissions:
+  id-token: write
+  attestations: write
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-tag:
+        required: false
+        description: "Upstream release tag (leave empty to auto-detect latest)"
+        type: string
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      TAG_NAME: ${{ steps.resolve.outputs.TAG_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Auto-detect upstream tag
+        id: autodetect
+        if: ${{ inputs.release-tag == '' }}
+        run: ./.github/check-needs-release.js | tee -a "$GITHUB_OUTPUT"
+      - name: Resolve tag
+        id: resolve
+        run: |
+          if [ -n "${{ inputs.release-tag }}" ]; then
+            echo "TAG_NAME=${{ inputs.release-tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "TAG_NAME=${{ steps.autodetect.outputs.TAG_NAME }}" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: check
+    if: needs.check.outputs.TAG_NAME != ''
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.check.outputs.TAG_NAME }}
+      OUT_FILENAME: "uBlock_${{ needs.check.outputs.TAG_NAME }}.crx"
+      DIST_DIR: "./uBlock/dist/build/uBlock0.chromium"
+    steps:
+      - name: Checkout ublock-origin-crx
+        uses: actions/checkout@v4
+      - name: Checkout uBlock
+        uses: actions/checkout@v4
+        with:
+          repository: gorhill/uBlock
+          ref: ${{ needs.check.outputs.TAG_NAME }}
+          path: uBlock
+      - uses: pnpm/action-setup@v4
+      - run: pnpm i --frozen-lockfile
+      - name: Build uBlock Origin sources
+        run: cd uBlock && make chromium
+      - name: Patch update URL
+        run: node .github/patch-update-url.js "$DIST_DIR/manifest.json"
+      - name: Build .crx
+        env:
+          CRX3_PRIVATE_KEY: ${{ secrets.CRX3_PRIVATE_KEY }}
+        run: |
+          echo "$CRX3_PRIVATE_KEY" \
+          | pnpm exec crx3 \
+            -p /dev/stdin \
+            -o "$OUT_FILENAME" \
+            "$DIST_DIR/"
+      - name: Get extension ID
+        id: crxid
+        run: |
+          echo -en "crx_id=" >> $GITHUB_OUTPUT
+          pnpm exec crx3-info < "$OUT_FILENAME" \
+          | grep ^id \
+          | sed 's/.* //' >> $GITHUB_OUTPUT
+      - name: Attest
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ env.OUT_FILENAME }}
+      - name: Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ needs.check.outputs.TAG_NAME }}
+        run: |
+          gh release create "$TAG_NAME" --draft --notes "$(./.github/make-release-body.sh)"
+          gh release upload "$TAG_NAME" "$OUT_FILENAME"
+          gh release edit "$TAG_NAME" --draft=false
+      - name: Update update.xml
+        env:
+          APP_ID: ${{ steps.crxid.outputs.crx_id }}
+          DOWNLOAD_URL: "https://github.com/${{ github.repository }}/releases/download/${{ needs.check.outputs.TAG_NAME }}/${{ env.OUT_FILENAME }}"
+          VERSION: ${{ needs.check.outputs.TAG_NAME }}
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          ./.github/generate-updatexml.sh > update.xml
+          git add update.xml
+          git commit -m 'update.xml: refresh'
+          git push origin HEAD:master
