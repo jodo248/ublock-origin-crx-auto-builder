@@ -62,7 +62,7 @@ jobs:
           subject-path: ${{ env.OUT_FILENAME }}
       - name: Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GHPAT_TOKEN }}
           TAG_NAME: ${{ inputs.release-tag }}
         run: |
           gh release create "$TAG_NAME" --draft --notes "$(./.github/make-release-body.sh)"
